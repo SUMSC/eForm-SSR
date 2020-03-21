@@ -12,7 +12,7 @@ RUN yarn config set registry https://registry.npm.taobao.org
 
 ENV NODE_ENV=production
 
-RUN $HOME/.yarn/bin/yarn & $HOME/.yarn/bin/yarn build
+RUN yarn & yarn build
 
 EXPOSE 8003
 
