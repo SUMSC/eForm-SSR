@@ -6,11 +6,11 @@ COPY . /opt/ssr
 
 WORKDIR /opt/ssr
 
-ENV NODE_ENV=production
-
 RUN npm config set registry https://registry.npm.taobao.org
 
 RUN npm install
+
+ENV NODE_ENV=production
 
 RUN npm run build
 
