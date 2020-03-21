@@ -1,4 +1,4 @@
-FROM node:12-slim
+FROM node:12
 
 LABEL VERSION="1.0" MAINTAINER="Amber<wzhzzmzzy@gmail.com>"
 
