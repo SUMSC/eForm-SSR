@@ -55,7 +55,8 @@ pipeline {
           dockerPassword = ""
           DOCKER_SERVER = "eform-amber-docker.pkg.coding.net"
           DOCKER_REPO = "${DOCKER_SERVER}/eform-web/docker"
-          BROKER_PORT = "8003"
+          DOCKER_NAME = "eform-ssr"
+          PORT = "8003"
           LOG_PATH = "/home/amber/eForm-Backend/logs"
           withCredentials([usernamePassword(
             credentialsId: env.CODING_ARTIFACTS_CREDENTIALS_ID,
@@ -75,10 +76,10 @@ pipeline {
             sshCommand remote: remote, command: "docker login -u ${dockerUser} -p ${dockerPassword} ${DOCKER_SERVER}"
             // eForm-Auth-Broker
             echo "部署 eForm-Auth-Broker"
-            sshCommand remote: remote, command: "docker pull ${DOCKER_REPO}/${BROKER_DOCKER_TAG}"
-            sshCommand remote: remote, command: "docker stop ${BROKER_DOCKER_NAME} | true"
-            sshCommand remote: remote, command: "docker rm ${BROKER_DOCKER_NAME} | true"
-            sshCommand remote: remote, command: "docker run --name ${BROKER_DOCKER_NAME} --net host -p 127.0.0.1:${BROKER_PORT}:${BROKER_PORT} -d ${DOCKER_REPO}/${BROKER_DOCKER_TAG}"
+            sshCommand remote: remote, command: "docker pull ${DOCKER_REPO}/${DOCKER_TAG}"
+            sshCommand remote: remote, command: "docker stop ${DOCKER_NAME} | true"
+            sshCommand remote: remote, command: "docker rm ${DOCKER_NAME} | true"
+            sshCommand remote: remote, command: "docker run --name ${DOCKER_NAME} --net host -p 127.0.0.1:${PORT}:${PORT} -d ${DOCKER_REPO}/${DOCKER_TAG}"
           }
         }
       }
