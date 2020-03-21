@@ -3,7 +3,7 @@ pipeline {
   environment {
     DOCKER_TAG = "ssr"
     ENTERPRISE = "eform-amber"
-    PROJECT = "eform-ssr"
+    PROJECT = "eform-web"
     ARTIFACT_REPO = "docker"
 
     ARTIFACT_BASE = "${ENTERPRISE}-docker.pkg.coding.net"
