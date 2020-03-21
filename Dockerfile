@@ -6,11 +6,13 @@ COPY . /opt/ssr
 
 WORKDIR /opt/ssr
 
-RUN npm config set registry https://registry.npm.taobao.org
-
 ENV NODE_ENV=production
 
-RUN npm i & npm run build
+RUN npm config set registry https://registry.npm.taobao.org
+
+RUN npm install
+
+RUN npm run build
 
 EXPOSE 8003
 
