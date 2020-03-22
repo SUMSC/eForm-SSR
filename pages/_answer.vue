@@ -14,7 +14,7 @@
             :key="i+1"
             :prop="'answer.' + i"
             :rules="[
-              form.required ? { required: true, message: '这道题还未回答', trigger: 'blur' } : null
+              { required: form.required, message: '这道题还未回答', trigger: 'blur' }
             ]"
             inline-message
           >
@@ -28,7 +28,7 @@
             <el-button type="primary" class="submit-btn" @click="submit">
               提交
             </el-button>
-            <el-button type="success" class="switch-btn" @click="changeUser">
+            <el-button type="success" class="switch-btn" v-if="$store.state.type" @click="changeUser">
               切换账号
             </el-button>
           </el-form-item>
@@ -93,6 +93,7 @@ export default {
       context.store.commit('setType', type)
       context.store.commit('setToken', token)
       return context.store.dispatch('getQnaire').catch(() => {
+        console.log('not found qnaire')
         context.error({ statusCode: 404, message: '问卷不存在' })
       })
     }
@@ -116,6 +117,7 @@ export default {
   },
   validate ({ params, error }) {
     if (!params.answer || params.answer.length === 0) {
+      console.log('invalid query')
       error({ statusCode: 404, message: '问卷不存在' })
     }
     return true
@@ -166,6 +168,7 @@ export default {
     handleClose (done) {
       this.$store.commit('toggleLoginModal')
       this.isSwitch = false
+      done()
     }
   }
 }
