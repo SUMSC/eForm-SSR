@@ -7,7 +7,6 @@ export const state = () => ({
   mobile: false,
   qnaire: {},
   answer: [],
-  type: false,
   id: 0,
   token: '',
   showLoginModal: false,
@@ -24,9 +23,6 @@ export const mutations = {
   },
   setQnaire (state, payload) {
     state.qnaire = payload
-  },
-  setType (state, payload) {
-    state.type = payload
   },
   setToken (state, payload) {
     state.token = payload
@@ -60,7 +56,7 @@ export const mutations = {
 
 export const actions = {
   getQnaire ({ state, commit }) {
-    return getQnaireById(state.id, state.type).then((res) => {
+    return getQnaireById(state.id).then((res) => {
       const qnaire = res.data.message[0]
       qnaire.form = qnaire.form.map((q, i) => ({ ...q, id: i }))
       commit('setQnaire', qnaire)
@@ -96,6 +92,6 @@ export const actions = {
     })
   },
   submitAnswer (context) {
-    submitAnswer(context.state.answer, context.state.id, context.state.type)
+    submitAnswer(context.state.answer, context.state.id)
   }
 }

@@ -68,10 +68,10 @@ export const getService = () => {
   return process.server ? serverService : clientService
 }
 
-export const getQnaireById = (id, type) => {
+export const getQnaireById = (id) => {
   return getService().get('/qnaire', {
     params: {
-      a: type, id
+      id
     }
   })
 }
@@ -93,13 +93,10 @@ export const deleteFile = filePath =>
     }
   })
 
-export const submitAnswer = (answer, qnaireId, type) =>
+export const submitAnswer = (answer, qnaireId) =>
   getService()({
     url: '/answer',
     method: 'POST',
-    params: {
-      a: type
-    },
     data: {
       answer,
       qnaire_id: qnaireId

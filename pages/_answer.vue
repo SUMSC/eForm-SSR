@@ -28,7 +28,7 @@
             <el-button type="primary" class="submit-btn" @click="submit">
               提交
             </el-button>
-            <el-button type="success" class="switch-btn" v-if="$store.state.type" @click="changeUser">
+            <el-button type="success" class="switch-btn" v-if="qnaire.a" @click="changeUser">
               切换账号
             </el-button>
           </el-form-item>
@@ -87,10 +87,8 @@ export default {
   asyncData (context) {
     if (process.server) {
       const id = Number(context.params.answer)
-      const type = context.query.a === '1'
       const token = getServerToken(context.req)
       context.store.commit('setID', id)
-      context.store.commit('setType', type)
       context.store.commit('setToken', token)
       return context.store.dispatch('getQnaire').catch(() => {
         console.log('not found qnaire')
