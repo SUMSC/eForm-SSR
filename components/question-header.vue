@@ -5,7 +5,7 @@
       <span class="q-name">{{ name }}</span>
       <span v-if="required" class="required">*</span>
     </p>
-    <p v-if="description" class="q-description">
+    <p v-if="description.length" class="q-description">
       {{ description }}
     </p>
   </div>
