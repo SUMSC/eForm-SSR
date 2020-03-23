@@ -17,7 +17,7 @@
 import QuestionMixin from '@/mixins/QuestionMixin'
 
 export default {
-  name: 'QnaireInput',
+  name: 'AreaPicker',
   mixins: [QuestionMixin],
   computed: {
     chinaArea () {

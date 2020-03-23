@@ -25,10 +25,10 @@
             />
           </el-form-item>
           <el-form-item class="action-block">
-            <el-button type="primary" class="submit-btn" @click="submit" :disabled="!qnaire.active">
+            <el-button type="primary" class="submit-btn" :disabled="!qnaire.active" @click="submit">
               提交
             </el-button>
-            <el-button type="success" class="switch-btn" v-if="!qnaire.a" @click="changeUser">
+            <el-button v-if="!qnaire.a" type="success" class="switch-btn" @click="changeUser">
               切换账号
             </el-button>
           </el-form-item>
@@ -74,33 +74,35 @@ export default {
     ...QuestionComponents
   },
   fetch (context) {
-    if (context.store.state.token.length > 0) {
-      return context.store.dispatch('getUserInfo').then((res) => {
-        const answer = res.my_answer
-        const hasAnswered = _.find(answer, { qnaire_id: context.store.state.id }) !== undefined
-        const isOwner = _.find(res.my_qnaire, { id: context.store.state.id }) !== undefined
-        context.store.commit('changeRole', isOwner ? 'owner' : 'guest')
-        return { isOwner, hasAnswered }
-      }).then(({ isOwner, hasAnswered }) => {
+    if (process.server) {
+      if (context.store.state.token.length > 0) {
+        return context.store.dispatch('getUserInfo').then((res) => {
+          const answer = res.my_answer
+          const hasAnswered = _.find(answer, { qnaire_id: context.store.state.id }) !== undefined
+          const isOwner = _.find(res.my_qnaire, { id: context.store.state.id }) !== undefined
+          context.store.commit('changeRole', isOwner ? 'owner' : 'guest')
+          return { isOwner, hasAnswered }
+        }).then(({ isOwner, hasAnswered }) => {
+          return context.store.dispatch('getQnaire').then((res) => {
+            if (!res.active && !isOwner) {
+              context.error({ statusCode: 403, message: '问卷尚未发布，没有权限预览' })
+            }
+            if (hasAnswered && !isOwner && res.settings.only_once) {
+              context.error({ statusCode: 400, message: '这个问卷你已经做过了哦' })
+            }
+          }).catch(() => {
+            context.error({ statusCode: 404, message: '问卷不存在' })
+          })
+        })
+      } else {
         return context.store.dispatch('getQnaire').then((res) => {
-          if (!res.active && !isOwner) {
+          if (!res.active) {
             context.error({ statusCode: 403, message: '问卷尚未发布，没有权限预览' })
-          }
-          if (hasAnswered && !isOwner && res.settings.only_once) {
-            context.error({ statusCode: 400, message: '这个问卷你已经做过了哦' })
           }
         }).catch(() => {
           context.error({ statusCode: 404, message: '问卷不存在' })
         })
-      })
-    } else {
-      return context.store.dispatch('getQnaire').then((res) => {
-        if (!res.active) {
-          context.error({ statusCode: 403, message: '问卷尚未发布，没有权限预览' })
-        }
-      }).catch(() => {
-        context.error({ statusCode: 404, message: '问卷不存在' })
-      })
+      }
     }
   },
   asyncData (context) {

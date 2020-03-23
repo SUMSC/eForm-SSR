@@ -78,6 +78,7 @@ export const getQnaireById = (id) => {
 
 export const getChinaArea = () =>
   getService()({
+    baseURL: '/api',
     url: '/china_area',
     method: 'GET'
   })
