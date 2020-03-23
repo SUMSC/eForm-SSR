@@ -11,10 +11,14 @@ export const state = () => ({
   token: '',
   showLoginModal: false,
   chinaArea: [],
-  userInfo: {}
+  userInfo: {},
+  role: ''
 })
 
 export const mutations = {
+  changeRole (state, payload) {
+    state.role = payload
+  },
   setMobile (state, payload) {
     state.mobile = payload
   },
@@ -61,6 +65,7 @@ export const actions = {
       qnaire.form = qnaire.form.map((q, i) => ({ ...q, id: i }))
       commit('setQnaire', qnaire)
       commit('initAnswer')
+      return qnaire
     })
   },
   getUserInfo ({ state, commit }) {

@@ -25,7 +25,7 @@
             />
           </el-form-item>
           <el-form-item class="action-block">
-            <el-button type="primary" class="submit-btn" @click="submit">
+            <el-button type="primary" class="submit-btn" @click="submit" :disabled="!qnaire.active">
               提交
             </el-button>
             <el-button type="success" class="switch-btn" v-if="qnaire.a" @click="changeUser">
@@ -78,9 +78,28 @@ export default {
       return context.store.dispatch('getUserInfo').then((res) => {
         const answer = res.my_answer
         const hasAnswered = _.find(answer, { qnaire_id: context.store.state.id }) !== undefined
-        if (hasAnswered) {
-          context.error({ statusCode: 400, message: '这个问卷你已经做过了哦' })
+        const isOwner = _.find(res.my_qnaire, { id: context.store.state.id }) !== undefined
+        context.store.commit('changeRole', isOwner ? 'owner' : 'guest')
+        return { isOwner, hasAnswered }
+      }).then(({ isOwner, hasAnswered }) => {
+        return context.store.dispatch('getQnaire').then((res) => {
+          if (!res.active && !isOwner) {
+            context.error({ statusCode: 403, message: '问卷尚未发布，没有权限预览' })
+          }
+          if (hasAnswered && !isOwner && res.settings.only_once) {
+            context.error({ statusCode: 400, message: '这个问卷你已经做过了哦' })
+          }
+        }).catch(() => {
+          context.error({ statusCode: 404, message: '问卷不存在' })
+        })
+      })
+    } else {
+      return context.store.dispatch('getQnaire').then((res) => {
+        if (!res.active) {
+          context.error({ statusCode: 403, message: '问卷尚未发布，没有权限预览' })
         }
+      }).catch(() => {
+        context.error({ statusCode: 404, message: '问卷不存在' })
       })
     }
   },
@@ -90,10 +109,6 @@ export default {
       const token = getServerToken(context.req)
       context.store.commit('setID', id)
       context.store.commit('setToken', token)
-      return context.store.dispatch('getQnaire').catch(() => {
-        console.log('not found qnaire')
-        context.error({ statusCode: 404, message: '问卷不存在' })
-      })
     }
   },
   data () {
@@ -121,7 +136,15 @@ export default {
     return true
   },
   created () {
-    //
+    if (process.client && !this.qnaire.active) {
+      this.$nextTick(() => {
+        this.$notify.info({
+          title: '提示',
+          message: '当前为答卷预览，无法提交',
+          duration: 0
+        })
+      })
+    }
   },
   mounted () {
     if (!this.$store.state.token) {
