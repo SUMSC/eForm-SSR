@@ -13,9 +13,9 @@
             v-for="(form, i) in qnaire.form"
             :key="i+1"
             :prop="'answer.' + i"
-            :rules="[
+            :rules="form.type !== 'plain-text' ? [
               { required: form.required, message: '这道题还未回答', trigger: 'blur' }
-            ]"
+            ]: []"
             inline-message
           >
             <component

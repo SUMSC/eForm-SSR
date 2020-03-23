@@ -6,7 +6,7 @@ const hashSeed = (secret, method) =>
   crypto.createHash(method).update(secret).digest('hex')
 
 export const clientService = axios.create({
-  baseURL: process.env.BASE_API,
+  baseURL: '/api',
   timeout: 5000
   // withCredentials: true // send cookies when cross-domain requests
 })
@@ -78,7 +78,6 @@ export const getQnaireById = (id) => {
 
 export const getChinaArea = () =>
   getService()({
-    baseURL: '/api',
     url: '/china_area',
     method: 'GET'
   })
