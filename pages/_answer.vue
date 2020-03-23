@@ -28,7 +28,7 @@
             <el-button type="primary" class="submit-btn" @click="submit" :disabled="!qnaire.active">
               提交
             </el-button>
-            <el-button type="success" class="switch-btn" v-if="qnaire.a" @click="changeUser">
+            <el-button type="success" class="switch-btn" v-if="!qnaire.a" @click="changeUser">
               切换账号
             </el-button>
           </el-form-item>
@@ -147,7 +147,7 @@ export default {
     }
   },
   mounted () {
-    if (!this.$store.state.token) {
+    if (!this.$store.state.token && !this.qnaire.a) {
       this.$store.commit('toggleLoginModal')
     }
   },
