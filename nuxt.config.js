@@ -36,7 +36,8 @@ export default {
     '@/plugins/element-ui'
   ],
   router: {
-    middleware: 'auth'
+    middleware: 'auth',
+    base: '/wj/'
   },
   /*
   ** Nuxt.js dev-modules
