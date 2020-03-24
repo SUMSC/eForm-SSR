@@ -68,6 +68,7 @@
 import _ from 'lodash'
 import { QuestionComponents } from '@/components'
 import { getServerToken } from '~/utils/cookies'
+import { deleteFile } from '~/utils/requests'
 
 export default {
   components: {
@@ -152,6 +153,11 @@ export default {
     if (!this.$store.state.token && !this.qnaire.a) {
       this.$store.commit('toggleLoginModal')
     }
+    window.onbeforeunload = () => {
+      this.$store.state.files.forEach((file) => {
+        deleteFile(file)
+      })
+    }
   },
   methods: {
     login () {
@@ -173,7 +179,9 @@ export default {
             cancelButtonText: '再看看',
             type: 'info'
           }).then(() => {
-            this.$store.dispatch('submitAnswer')
+            this.$store.dispatch('submitAnswer').then(() => {
+              this.$router.push('/success')
+            })
           })
           return true
         } else {

@@ -47,6 +47,7 @@ export default {
     handleRemove () {
     },
     handleExceed () {
+      this.$message.warning('无法上传更多文件了')
     },
     beforeRemove () {
       return this.$confirm('确定删除这个文件吗？', '提示', {
@@ -63,6 +64,7 @@ export default {
     },
     handleSuccess (res) {
       this.data = res.message
+      this.$store.commit('appendFile', res.message)
     }
   }
 }

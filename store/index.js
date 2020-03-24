@@ -12,7 +12,8 @@ export const state = () => ({
   showLoginModal: false,
   chinaArea: [],
   userInfo: {},
-  role: ''
+  role: '',
+  files: []
 })
 
 export const mutations = {
@@ -55,6 +56,9 @@ export const mutations = {
   },
   updateAnswer (state, { id, value }) {
     Vue.set(state.answer, id, value)
+  },
+  appendFile (state, payload) {
+    state.files.push(payload)
   }
 }
 
