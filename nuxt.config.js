@@ -60,6 +60,10 @@ export default {
     '/api': {
       target: 'http://localhost:8002',
       changeOrigin: true
+    },
+    '/login': {
+      target: 'http://localhost:8000',
+      changeOrigin: true
     }
   },
   /*
@@ -73,6 +77,10 @@ export default {
   */
   build: {
     transpile: [/^element-ui/, /^js-cookie/, /^lodash/],
+    babel: {
+      presets: ['@nuxt/babel-preset-app'],
+      plugins: ['@babel/plugin-proposal-export-default-from']
+    },
     /*
     ** You can extend webpack config here
     */

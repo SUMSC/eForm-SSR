@@ -67,9 +67,6 @@ export const actions = {
     return getQnaireById(state.id).then((res) => {
       const qnaire = res.data.message[0]
       qnaire.form = qnaire.form.map((q, i) => {
-        if (q.type === 'qnaire-select' || q.type === 'qnaire-checkbox') {
-          q.meta.selection = q.meta.selection.map(s => ({ value: s }))
-        }
         return { ...q, id: i }
       })
       commit('setQnaire', qnaire)

@@ -5,6 +5,7 @@
         <h1>{{ qnaire.name }}</h1>
       </div>
       <p>{{ qnaire.description }}</p>
+      <avatar-action v-if="!qnaire.a"/>
     </header>
     <div class="paper">
       <div class="survey">
@@ -28,9 +29,6 @@
             <el-button type="primary" class="submit-btn" :disabled="!qnaire.active" @click="submit">
               提交
             </el-button>
-            <el-button v-if="!qnaire.a" type="success" class="switch-btn" @click="changeUser">
-              切换账号
-            </el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -40,39 +38,21 @@
         Copyright © 2019-2020 SUMSC
       </p>
     </footer>
-    <el-dialog
-      title="登陆"
-      :visible.sync="showModal"
-      :show-close="isSwitch"
-      :close-on-click-modal="isSwitch"
-      :close-on-press-escape="isSwitch"
-      center
-      :before-close="handleClose"
-    >
-      <el-form :model="loginForm">
-        <el-form-item prop="id" label="学号">
-          <el-input v-model="loginForm.id" />
-        </el-form-item>
-        <el-form-item prop="password" label="密码">
-          <el-input v-model="loginForm.password" type="password" />
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="login">确 定</el-button>
-      </span>
-    </el-dialog>
+    <LoginDialog :title="loginFormTitle" />
   </div>
 </template>
 
 <script>
 import _ from 'lodash'
-import { QuestionComponents } from '@/components'
+import { QuestionComponents, AvatarAction, LoginDialog } from '@/components'
 import { getServerToken } from '~/utils/cookies'
 import { deleteFile } from '~/utils/requests'
 
 export default {
   components: {
-    ...QuestionComponents
+    ...QuestionComponents,
+    AvatarAction,
+    LoginDialog
   },
   fetch (context) {
     if (process.server) {
@@ -116,11 +96,8 @@ export default {
   },
   data () {
     return {
-      loginForm: {
-        id: '',
-        password: ''
-      },
-      isSwitch: false
+      isSwitch: false,
+      loginFormTitle: '登陆'
     }
   },
   computed: {
@@ -131,20 +108,14 @@ export default {
       return this.$store.state.qnaire
     }
   },
-  validate ({ params, error }) {
-    if (!params.answer || params.answer.length === 0) {
-      console.log('invalid query')
-      error({ statusCode: 404, message: '问卷不存在' })
-    }
-    return true
-  },
   created () {
     if (process.client && !this.qnaire.active) {
       this.$nextTick(() => {
         this.$notify.info({
           title: '提示',
           message: '当前为答卷预览，无法提交',
-          duration: 0
+          duration: 0,
+          position: 'bottom-right'
         })
       })
     }
@@ -163,9 +134,11 @@ export default {
     login () {
       this.$store.dispatch('login', this.loginForm).then((res) => {
         const answer = res.my_answer
-        const hasAnswered = _.find(answer, { qnaire_id: this.$store.state.id }) !== undefined
-        if (hasAnswered) {
-          this.$nuxt.error({ statusCode: 400, message: '这个问卷你已经做过了哦' })
+        if (this.qnaire.settings.only_once) {
+          const hasAnswered = _.find(answer, { qnaire_id: this.$store.state.id }) !== undefined
+          if (hasAnswered) {
+            this.$nuxt.error({ statusCode: 400, message: '这个问卷你已经做过了哦' })
+          }
         }
       })
     },
@@ -201,6 +174,25 @@ export default {
       this.isSwitch = false
       done()
     }
+  },
+  head () {
+    return {
+      title: `${this.qnaire.name} - eForm`,
+      meta: [{
+        name: 'keywords',
+        content: '调查问卷'
+      }, {
+        name: 'description',
+        content: this.qnaire.description
+      }]
+    }
+  },
+  validate ({ params, error }) {
+    if (!params.answer || params.answer.length === 0) {
+      console.log('invalid query')
+      error({ statusCode: 404, message: '问卷不存在' })
+    }
+    return true
   }
 }
 </script>
@@ -272,15 +264,5 @@ export default {
     margin-top: 50px;
     display: flex;
     justify-content: center;
-  }
-</style>
-
-<style>
-  .el-dialog {
-    min-width: 20em !important;
-    max-width: 30em !important;
-  }
-  .el-input {
-    width: 80%;
   }
 </style>

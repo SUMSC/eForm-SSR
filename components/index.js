@@ -17,3 +17,6 @@ export const QuestionComponents = {
   'qnaire-select': QnaireSelect,
   'qnaire-textarea': QnaireTextarea
 }
+
+export AvatarAction from './avatar.vue'
+export LoginDialog from './login-dialog.vue'

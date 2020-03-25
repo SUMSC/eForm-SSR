@@ -56,7 +56,7 @@ loginService.interceptors.response.use(
 export const login = data =>
   loginService({
     url: '/',
-    method: 'post',
+    method: 'POST',
     data: {
       id: data.id,
       token: hashSeed(data.password, 'md5')
