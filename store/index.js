@@ -2,6 +2,7 @@ import Vue from 'vue'
 // import _ from 'lodash'
 import { Message } from 'element-ui'
 import { getChinaArea, getQnaireById, getUserInfo, login, submitAnswer } from '@/utils/requests'
+import { setToken } from '~/utils/cookies'
 
 export const state = () => ({
   mobile: false,
@@ -84,6 +85,7 @@ export const actions = {
     id = id.trim()
     try {
       const { message } = await login({ id, password })
+      setToken(message)
       context.commit('setToken', message)
       context.commit('toggleLoginModal')
       return context.dispatch('getUserInfo')

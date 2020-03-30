@@ -1,43 +1,46 @@
 <template>
-  <div class="container">
-    <header class="survey-header">
-      <div id="title">
-        <h1>{{ qnaire.name }}</h1>
+  <div>
+    <div v-if="!mobile" class="container">
+      <header class="survey-header">
+        <div id="title">
+          <h1>{{ qnaire.name }}</h1>
+        </div>
+        <p>{{ qnaire.description }}</p>
+        <avatar-action v-if="!qnaire.a" />
+      </header>
+      <div class="paper">
+        <div class="survey">
+          <el-form ref="survey-form" :model="$store.state" class="survey-qnaire">
+            <el-form-item
+              v-for="(form, i) in qnaire.form"
+              :key="i+1"
+              :prop="'answer.' + i"
+              :rules="form.type !== 'plain-text' ? [
+                { required: form.required, message: '这道题还未回答', trigger: 'blur' }
+              ]: []"
+              inline-message
+            >
+              <component
+                :is="form.type"
+                :id="i"
+                @clear="clearValidate"
+              />
+            </el-form-item>
+            <el-form-item class="action-block">
+              <el-button type="primary" class="submit-btn" :disabled="!qnaire.active" @click="submit">
+                提交
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </div>
       </div>
-      <p>{{ qnaire.description }}</p>
-      <avatar-action v-if="!qnaire.a"/>
-    </header>
-    <div class="paper">
-      <div class="survey">
-        <el-form ref="survey-form" :model="$store.state" class="survey-qnaire">
-          <el-form-item
-            v-for="(form, i) in qnaire.form"
-            :key="i+1"
-            :prop="'answer.' + i"
-            :rules="form.type !== 'plain-text' ? [
-              { required: form.required, message: '这道题还未回答', trigger: 'blur' }
-            ]: []"
-            inline-message
-          >
-            <component
-              :is="form.type"
-              :id="i"
-              @clear="clearValidate"
-            />
-          </el-form-item>
-          <el-form-item class="action-block">
-            <el-button type="primary" class="submit-btn" :disabled="!qnaire.active" @click="submit">
-              提交
-            </el-button>
-          </el-form-item>
-        </el-form>
-      </div>
+      <footer class="survey-footer">
+        <p class="footer-copyright">
+          Copyright © 2019-2020 SUMSC
+        </p>
+      </footer>
     </div>
-    <footer class="survey-footer">
-      <p class="footer-copyright">
-        Copyright © 2019-2020 SUMSC
-      </p>
-    </footer>
+    <MobileAnswer v-else @submit="submit" />
     <LoginDialog :title="loginFormTitle" />
   </div>
 </template>
@@ -47,15 +50,19 @@ import _ from 'lodash'
 import { QuestionComponents, AvatarAction, LoginDialog } from '@/components'
 import { getServerToken } from '~/utils/cookies'
 import { deleteFile } from '~/utils/requests'
+import MobileAnswer from '~/components/mobile-answer.vue'
 
 export default {
   components: {
     ...QuestionComponents,
     AvatarAction,
-    LoginDialog
+    LoginDialog,
+    MobileAnswer
   },
   fetch (context) {
     if (process.server) {
+      const ua = context.req ? context.req.headers['user-agent'] : navigator.userAgent || ''
+      context.store.commit('setMobile', !!ua.match(/AppleWebKit.*Mobile.*/))
       if (context.store.state.token.length > 0) {
         return context.store.dispatch('getUserInfo').then((res) => {
           const answer = res.my_answer
@@ -106,6 +113,9 @@ export default {
     },
     qnaire () {
       return this.$store.state.qnaire
+    },
+    mobile () {
+      return this.$store.state.mobile
     }
   },
   created () {
@@ -145,22 +155,28 @@ export default {
     submit () {
       // eslint-disable-next-line no-console
       console.log(this.$store.state.answer)
-      this.$refs['survey-form'].validate((valid) => {
-        if (valid) {
-          this.$confirm('确认要提交了吗？', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '再看看',
-            type: 'info'
-          }).then(() => {
-            this.$store.dispatch('submitAnswer').then(() => {
-              this.$router.push('/success')
+      if (!this.$store.state.mobile) {
+        this.$refs['survey-form'].validate((valid) => {
+          if (valid) {
+            this.$confirm('确认要提交了吗？', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '再看看',
+              type: 'info'
+            }).then(() => {
+              this.$store.dispatch('submitAnswer').then(() => {
+                this.$router.push('/success')
+              })
             })
-          })
-          return true
-        } else {
-          return false
-        }
-      })
+            return true
+          } else {
+            return false
+          }
+        })
+      } else {
+        this.$store.dispatch('submitAnswer').then(() => {
+          this.$router.push('/success')
+        })
+      }
     },
     clearValidate (prop) {
       this.$refs['survey-form'].clearValidate(prop)
@@ -189,7 +205,6 @@ export default {
   },
   validate ({ params, error }) {
     if (!params.answer || params.answer.length === 0) {
-      console.log('invalid query')
       error({ statusCode: 404, message: '问卷不存在' })
     }
     return true

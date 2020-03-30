@@ -1,13 +1,16 @@
 <template>
-  <div class="q-container">
+  <div>
     <question-header :id="id" :name="form.name" :required="form.required" :description="form.description" />
-    <div class="q-form-container">
-      <el-input
-        v-model="data"
-        class="q-input"
-        size="medium"
-      />
+    <div v-if="!mobile" class="q-container">
+      <div class="q-form-container">
+        <el-input
+          v-model="data"
+          class="q-input"
+          size="medium"
+        />
+      </div>
     </div>
+    <van-field v-else v-model="data" placeholder="请输入" />
   </div>
 </template>
 

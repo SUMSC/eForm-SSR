@@ -33,7 +33,8 @@ export default {
   ** Plugins to load before mounting the App
   */
   plugins: [
-    '@/plugins/element-ui'
+    '@/plugins/element-ui',
+    '@/plugins/vant-ui'
   ],
   router: {
     middleware: 'auth',
@@ -76,7 +77,7 @@ export default {
   ** Build configuration
   */
   build: {
-    transpile: [/^element-ui/, /^js-cookie/, /^lodash/],
+    transpile: [/^element-ui/, /^js-cookie/, /^lodash/, /^vant/, /^moment/],
     babel: {
       presets: ['@nuxt/babel-preset-app'],
       plugins: ['@babel/plugin-proposal-export-default-from']

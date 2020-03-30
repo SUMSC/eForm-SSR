@@ -2,7 +2,7 @@
   <p>{{ form.name }}</p>
 </template>
 <script>
-import QuestionMixin from '../mixins/QuestionMixin'
+import QuestionMixin from '../../mixins/QuestionMixin'
 
 export default {
   name: 'PlainText',

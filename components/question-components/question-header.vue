@@ -1,5 +1,5 @@
 <template>
-  <div class="q-header">
+  <div v-if="!$store.state.mobile" class="q-header">
     <p class="q-title">
       <span class="q-topic">{{ id | idNormalize }}</span>
       <span class="q-name">{{ name }}</span>
@@ -9,6 +9,13 @@
       {{ description }}
     </p>
   </div>
+  <van-cell v-else class="m-q-header">
+    <template #title>
+      <span class="q-topic">{{ id | idNormalize }}</span>
+      <span class="q-name">{{ name }}</span>
+      <span v-if="required" class="required">*</span>
+    </template>
+  </van-cell>
 </template>
 
 <script>
@@ -74,5 +81,18 @@ export default {
     color: #909399;
     font-size: 14px;
     margin: 10px 0 5px 20px;
+  }
+  .m-q-header {
+    padding: 1.2rem;
+  }
+  .m-q-header .required {
+    color: red;
+  }
+  .m-q-header .q-topic {
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+  .m-q-header .q-name {
+    font-size: 1.1rem;
   }
 </style>

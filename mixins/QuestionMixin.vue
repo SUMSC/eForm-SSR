@@ -1,5 +1,5 @@
 <script>
-import QuestionHeader from '@/components/question-header'
+import QuestionHeader from '@/components/question-components/question-header'
 export default {
   name: 'QuestionMixin',
   components: {
@@ -28,6 +28,9 @@ export default {
         this.$emit('clear', 'answer.' + this.id)
         this.$store.commit('updateAnswer', { id: this.id, value })
       }
+    },
+    mobile () {
+      return this.$store.state.mobile
     }
   }
 }
